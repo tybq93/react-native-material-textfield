@@ -1,22 +1,31 @@
-import PropTypes from 'prop-types'
-import React, {PureComponent} from 'react'
-import {View, Text, TextInput, Animated, StyleSheet, Platform, ViewPropTypes, I18nManager} from 'react-native'
+import PropTypes from "prop-types";
+import React, { PureComponent } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Animated,
+  StyleSheet,
+  Platform,
+  ViewPropTypes,
+  I18nManager,
+} from "react-native";
 
-import RN from 'react-native/package.json'
+import RN from "react-native/package.json";
 
-import Line from '../line'
-import Label from '../label'
-import Affix from '../affix'
-import Helper from '../helper'
-import Counter from '../counter'
+import Line from "../line";
+import Label from "../label";
+import Affix from "../affix";
+import Helper from "../helper";
+import Counter from "../counter";
 
-import styles from './styles.js'
+import styles from "./styles.js";
 
 export default class TextField extends PureComponent {
   static defaultProps = {
-    underlineColorAndroid: 'transparent',
+    underlineColorAndroid: "transparent",
     disableFullscreenUI: true,
-    autoCapitalize: 'sentences',
+    autoCapitalize: "sentences",
     editable: true,
 
     animationDuration: 225,
@@ -28,19 +37,19 @@ export default class TextField extends PureComponent {
     labelPadding: 4,
     inputContainerPadding: 8,
 
-    tintColor: 'rgb(0, 145, 234)',
-    textColor: 'rgba(0, 0, 0, .87)',
-    baseColor: 'rgba(0, 0, 0, .38)',
+    tintColor: "rgb(0, 145, 234)",
+    textColor: "rgba(0, 0, 0, .87)",
+    baseColor: "rgba(0, 0, 0, .38)",
 
-    errorColor: 'rgb(213, 0, 0)',
+    errorColor: "rgb(213, 0, 0)",
 
     lineWidth: StyleSheet.hairlineWidth,
     activeLineWidth: 2,
 
     disabled: false,
-    disabledLineType: 'dotted',
+    disabledLineType: "dotted",
     disabledLineWidth: 1,
-  }
+  };
 
   static propTypes = {
     ...TextInput.propTypes,
@@ -84,24 +93,24 @@ export default class TextField extends PureComponent {
 
     containerStyle: (ViewPropTypes || View.propTypes).style,
     inputContainerStyle: (ViewPropTypes || View.propTypes).style,
-  }
+  };
 
   constructor(props) {
-    super(props)
+    super(props);
 
-    this.onBlur = this.onBlur.bind(this)
-    this.onFocus = this.onFocus.bind(this)
-    this.onPress = this.focus.bind(this)
-    this.onChange = this.onChange.bind(this)
-    this.onChangeText = this.onChangeText.bind(this)
-    this.onContentSizeChange = this.onContentSizeChange.bind(this)
-    this.onFocusAnimationEnd = this.onFocusAnimationEnd.bind(this)
+    this.onBlur = this.onBlur.bind(this);
+    this.onFocus = this.onFocus.bind(this);
+    this.onPress = this.focus.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onChangeText = this.onChangeText.bind(this);
+    this.onContentSizeChange = this.onContentSizeChange.bind(this);
+    this.onFocusAnimationEnd = this.onFocusAnimationEnd.bind(this);
 
-    this.updateRef = this.updateRef.bind(this, 'input')
+    this.updateRef = this.updateRef.bind(this, "input");
 
-    let {value, error, fontSize} = this.props
+    let { value, error, fontSize } = this.props;
 
-    this.mounted = false
+    this.mounted = false;
     this.state = {
       text: value,
 
@@ -113,172 +122,185 @@ export default class TextField extends PureComponent {
       errored: !!error,
 
       height: fontSize * 1.5,
-    }
+    };
   }
 
   componentWillReceiveProps(props) {
-    let {error} = this.state
+    let { error } = this.state;
 
     if (null != props.value) {
-      this.setState({text: props.value})
+      this.setState({ text: props.value });
     }
 
     if (props.error && props.error !== error) {
-      this.setState({error: props.error})
+      this.setState({ error: props.error });
     }
 
     if (props.error !== this.props.error) {
-      this.setState({errored: !!props.error})
+      this.setState({ errored: !!props.error });
     }
   }
 
   componentDidMount() {
-    this.mounted = true
+    this.mounted = true;
   }
 
   componentWillUnmount() {
-    this.mounted = false
+    this.mounted = false;
   }
 
   componentWillUpdate(props, state) {
-    let {error, animationDuration: duration} = this.props
-    let {focus, focused} = this.state
+    let { error, animationDuration: duration } = this.props;
+    let { focus, focused } = this.state;
 
     if (props.error !== error || focused ^ state.focused) {
-      let toValue = this.focusState(props.error, state.focused)
+      let toValue = this.focusState(props.error, state.focused);
 
-      Animated.timing(focus, {toValue, duration}).start(this.onFocusAnimationEnd)
+      Animated.timing(focus, { toValue, duration }).start(
+        this.onFocusAnimationEnd
+      );
     }
   }
 
   updateRef(name, ref) {
-    this[name] = ref
+    this[name] = ref;
   }
 
   focusState(error, focused) {
-    return error ? -1 : focused ? 1 : 0
+    return error ? -1 : focused ? 1 : 0;
   }
 
   focus() {
-    let {disabled, editable} = this.props
+    let { disabled, editable } = this.props;
 
     if (!disabled && editable) {
-      this.input.focus()
+      this.input.focus();
     }
   }
 
   blur() {
-    this.input.blur()
+    this.input.blur();
   }
 
   clear() {
-    this.input.clear()
+    this.input.clear();
 
     /* onChangeText is not triggered by .clear() */
-    this.onChangeText('')
+    this.onChangeText("");
   }
 
   value() {
-    let {text, receivedFocus} = this.state
-    let {value, defaultValue} = this.props
+    let { text, receivedFocus } = this.state;
+    let { value, defaultValue } = this.props;
 
-    return receivedFocus || null != value || null == defaultValue ? text : defaultValue
+    return receivedFocus || null != value || null == defaultValue
+      ? text
+      : defaultValue;
   }
 
   isFocused() {
-    return this.input.isFocused()
+    return this.input.isFocused();
   }
 
   isRestricted() {
-    let {characterRestriction} = this.props
-    let {text = ''} = this.state
+    let { characterRestriction } = this.props;
+    let { text = "" } = this.state;
 
-    return characterRestriction < text.length
+    return characterRestriction < text.length;
   }
 
   onFocus(event) {
-    let {onFocus, clearTextOnFocus} = this.props
+    let { onFocus, clearTextOnFocus } = this.props;
 
-    if ('function' === typeof onFocus) {
-      onFocus(event)
+    if ("function" === typeof onFocus) {
+      onFocus(event);
     }
 
     if (clearTextOnFocus) {
-      this.clear()
+      this.clear();
     }
 
-    this.setState({focused: true, receivedFocus: true})
+    this.setState({ focused: true, receivedFocus: true });
   }
 
   onBlur(event) {
-    let {onBlur} = this.props
+    let { onBlur } = this.props;
 
-    if ('function' === typeof onBlur) {
-      onBlur(event)
+    if ("function" === typeof onBlur) {
+      onBlur(event);
     }
 
-    this.setState({focused: false})
+    this.setState({ focused: false });
   }
 
   onChange(event) {
-    let {onChange, multiline} = this.props
+    let { onChange, multiline } = this.props;
 
-    if ('function' === typeof onChange) {
-      onChange(event)
+    if ("function" === typeof onChange) {
+      onChange(event);
     }
 
     /* XXX: onContentSizeChange is not called on RN 0.44 and 0.45 */
-    if (multiline && 'android' === Platform.OS) {
+    if (multiline && "android" === Platform.OS) {
       if (/^0\.4[45]\./.test(RN.version)) {
-        this.onContentSizeChange(event)
+        this.onContentSizeChange(event);
       }
     }
   }
 
   onChangeText(text) {
-    let {onChangeText} = this.props
+    let { onChangeText } = this.props;
 
-    this.setState({text})
+    this.setState({ text });
 
-    if ('function' === typeof onChangeText) {
-      onChangeText(text)
+    if ("function" === typeof onChangeText) {
+      onChangeText(text);
     }
   }
 
   onContentSizeChange(event) {
-    let {onContentSizeChange, fontSize} = this.props
-    let {height} = event.nativeEvent.contentSize
+    let { onContentSizeChange, fontSize } = this.props;
+    let { height } = event.nativeEvent.contentSize;
 
-    if ('function' === typeof onContentSizeChange) {
-      onContentSizeChange(event)
+    if ("function" === typeof onContentSizeChange) {
+      onContentSizeChange(event);
     }
 
     this.setState({
-      height: Math.max(fontSize * 1.5, Math.ceil(height) + Platform.select({ios: 5, android: 1})),
-    })
+      height: Math.max(
+        fontSize * 1.5,
+        Math.ceil(height) + Platform.select({ ios: 5, android: 1 })
+      ),
+    });
   }
 
   onFocusAnimationEnd() {
     if (this.mounted) {
-      this.setState((state, {error}) => ({error}))
+      this.setState((state, { error }) => ({ error }));
     }
   }
 
   renderAccessory() {
-    let {renderAccessory} = this.props
+    let { renderAccessory } = this.props;
 
-    if ('function' !== typeof renderAccessory) {
-      return null
+    if ("function" !== typeof renderAccessory) {
+      return null;
     }
 
-    return <View style={styles.accessory}>{renderAccessory()}</View>
+    return <View style={styles.accessory}>{renderAccessory()}</View>;
   }
 
   renderAffix(type, active, focused) {
-    let {[type]: affix, fontSize, baseColor, animationDuration, affixTextStyle} = this.props
+    let {
+      [type]: affix,
+      fontSize,
+      baseColor,
+      animationDuration,
+      affixTextStyle,
+    } = this.props;
 
     if (null == affix) {
-      return null
+      return null;
     }
 
     let props = {
@@ -288,17 +310,25 @@ export default class TextField extends PureComponent {
       fontSize,
       baseColor,
       animationDuration,
-    }
+    };
 
     return (
       <Affix style={affixTextStyle} {...props}>
         {affix}
       </Affix>
-    )
+    );
   }
 
   render() {
-    let {receivedFocus, focus, focused, error, errored, height, text = ''} = this.state
+    let {
+      receivedFocus,
+      focus,
+      focused,
+      error,
+      errored,
+      height,
+      text = "",
+    } = this.state;
     let {
       style: inputStyleOverrides,
       label,
@@ -329,46 +359,57 @@ export default class TextField extends PureComponent {
       inputContainerStyle: inputContainerStyleOverrides,
       clearTextOnFocus,
       ...props
-    } = this.props
+    } = this.props;
 
     if (props.multiline && props.height) {
       /* Disable autogrow if height is passed as prop */
-      height = props.height
+      height = props.height;
     }
 
-    let defaultVisible = !(receivedFocus || null != value || null == defaultValue)
+    let defaultVisible = !(
+      receivedFocus ||
+      null != value ||
+      null == defaultValue
+    );
 
-    value = defaultVisible ? defaultValue : text
+    value = defaultVisible ? defaultValue : text;
 
-    let active = !!(value || props.placeholder)
-    let count = value.length
-    let restricted = limit < count
+    let active = !!(value || props.placeholder);
+    let count = value.length;
+    let restricted = limit < count;
 
-    let textAlign = I18nManager.isRTL ? 'right' : 'left'
+    let textAlign = I18nManager.isRTL ? "right" : "left";
 
     let borderBottomColor = restricted
       ? errorColor
       : focus.interpolate({
           inputRange: [-1, 0, 1],
           outputRange: [errorColor, baseColor, tintColor],
-        })
+        });
 
     let borderBottomWidth = restricted
       ? activeLineWidth
       : focus.interpolate({
           inputRange: [-1, 0, 1],
           outputRange: [activeLineWidth, lineWidth, activeLineWidth],
-        })
+        });
 
     let inputContainerStyle = {
       paddingTop: labelHeight,
       paddingBottom: inputContainerPadding,
 
-      ...(disabled ? {overflow: 'hidden'} : {borderBottomColor, borderBottomWidth}),
+      ...(disabled
+        ? { overflow: "hidden" }
+        : { borderBottomColor, borderBottomWidth }),
       ...(props.multiline
-        ? {height: 'web' === Platform.OS ? 'auto' : labelHeight + inputContainerPadding + height}
-        : {height: labelHeight + inputContainerPadding + fontSize * 1.5}),
-    }
+        ? {
+            height:
+              "web" === Platform.OS
+                ? "auto"
+                : labelHeight + inputContainerPadding + height,
+          }
+        : { height: labelHeight + inputContainerPadding + fontSize * 1.5 }),
+    };
 
     let inputStyle = {
       fontSize,
@@ -381,12 +422,12 @@ export default class TextField extends PureComponent {
             height: fontSize * 1.5 + height,
 
             ...Platform.select({
-              ios: {top: -1},
-              android: {textAlignVertical: 'top'},
+              ios: { top: -1 },
+              android: { textAlignVertical: "top" },
             }),
           }
-        : {height: fontSize * 1.5}),
-    }
+        : { height: fontSize * 1.5 }),
+    };
 
     let errorStyle = {
       color: errorColor,
@@ -402,7 +443,7 @@ export default class TextField extends PureComponent {
             inputRange: [-1, 0, 1],
             outputRange: [titleFontSize, 0, 0],
           }),
-    }
+    };
 
     let titleStyle = {
       color: baseColor,
@@ -413,10 +454,10 @@ export default class TextField extends PureComponent {
       }),
 
       fontSize: titleFontSize,
-    }
+    };
 
     let helperContainerStyle = {
-      flexDirection: 'row',
+      flexDirection: "row",
       height:
         title || limit
           ? titleFontSize * 2
@@ -424,24 +465,28 @@ export default class TextField extends PureComponent {
               inputRange: [-1, 0, 1],
               outputRange: [titleFontSize * 2, 8, 8],
             }),
-    }
+    };
 
     let containerProps = {
       style: containerStyle,
       onStartShouldSetResponder: () => true,
       onResponderRelease: this.onPress,
-      pointerEvents: !disabled && editable ? 'auto' : 'none',
-    }
+      pointerEvents: !disabled && editable ? "auto" : "none",
+    };
 
     let inputContainerProps = {
-      style: [styles.inputContainer, inputContainerStyle, inputContainerStyleOverrides],
-    }
+      style: [
+        styles.inputContainer,
+        inputContainerStyle,
+        inputContainerStyleOverrides,
+      ],
+    };
 
     let lineProps = {
       type: disabledLineType,
       width: disabledLineWidth,
       color: baseColor,
-    }
+    };
 
     let labelProps = {
       baseSize: labelHeight,
@@ -456,8 +501,11 @@ export default class TextField extends PureComponent {
       focused,
       errored,
       restricted,
-      style: {...labelTextStyle, marginLeft: focused || value ? 0 : 25},
-    }
+      style: {
+        ...labelTextStyle,
+        marginLeft: focused || value ? 0 : this.props.icon ? 25 : 0,
+      },
+    };
 
     let counterProps = {
       baseColor,
@@ -466,7 +514,7 @@ export default class TextField extends PureComponent {
       limit,
       fontSize: titleFontSize,
       style: titleTextStyle,
-    }
+    };
 
     return (
       <View {...containerProps}>
@@ -476,8 +524,12 @@ export default class TextField extends PureComponent {
           <Label {...labelProps}>{label}</Label>
 
           <View style={styles.row}>
-            {this.renderAffix('prefix', active, focused)}
-            {this.props.icon ? <View style={{width: 20}}>{this.props.icon()}</View> : null}
+            {this.renderAffix("prefix", active, focused)}
+            {this.props.icon ? (
+              <View style={{ width: 20, justifyContent: "center" }}>
+                {this.props.icon()}
+              </View>
+            ) : null}
             <TextInput
               style={[styles.input, inputStyle, inputStyleOverrides]}
               selectionColor={tintColor}
@@ -492,7 +544,7 @@ export default class TextField extends PureComponent {
               ref={this.updateRef}
             />
 
-            {this.renderAffix('suffix', active, focused)}
+            {this.renderAffix("suffix", active, focused)}
             {this.renderAccessory()}
           </View>
         </Animated.View>
@@ -506,6 +558,6 @@ export default class TextField extends PureComponent {
           <Counter {...counterProps} />
         </Animated.View>
       </View>
-    )
+    );
   }
 }
